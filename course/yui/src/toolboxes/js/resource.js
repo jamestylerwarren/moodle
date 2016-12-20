@@ -445,56 +445,54 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
         // Prevent the default button action.
         ev.preventDefault();
 
-        // Current Mode
-        var groupmode = parseInt(button.getData('nextgroupmode'), 10),
-            newtitle = '',
-            iconsrc = '',
-            newtitlestr,
-            data,
-            spinner,
-            nextgroupmode = groupmode + 1,
-            buttonimg = button.one('img');
+        window.require(['core/templates'], function(Templates) {
+            // Current Mode
+            var groupmode = parseInt(button.getData('nextgroupmode'), 10),
+                newtitle = '',
+                iconhtml = '',
+                newtitlestr,
+                newpix,
+                data,
+                spinner,
+                nextgroupmode = groupmode + 1,
+                buttonimg = button.one('.icon');
 
-        if (nextgroupmode > 2) {
-            nextgroupmode = 0;
-        }
+            if (nextgroupmode > 2) {
+                nextgroupmode = 0;
+            }
 
-        if (groupmode === this.GROUPS_NONE) {
-            newtitle = 'groupsnone';
-            iconsrc = M.util.image_url('i/groupn', 'moodle');
-        } else if (groupmode === this.GROUPS_SEPARATE) {
-            newtitle = 'groupsseparate';
-            iconsrc = M.util.image_url('i/groups', 'moodle');
-        } else if (groupmode === this.GROUPS_VISIBLE) {
-            newtitle = 'groupsvisible';
-            iconsrc = M.util.image_url('i/groupv', 'moodle');
-        }
-        newtitlestr = M.util.get_string('clicktochangeinbrackets', 'moodle', M.util.get_string(newtitle, 'moodle'));
+            if (groupmode === this.GROUPS_NONE) {
+                newtitle = 'groupsnone';
+                newpix = 'i/groupn';
+            } else if (groupmode === this.GROUPS_SEPARATE) {
+                newtitle = 'groupsseparate';
+                newpix = 'i/groups';
+            } else if (groupmode === this.GROUPS_VISIBLE) {
+                newtitle = 'groupsvisible';
+                newpix = 'i/groupv';
+            }
+            newtitlestr = M.util.get_string('clicktochangeinbrackets', 'moodle', M.util.get_string(newtitle, 'moodle'));
+            iconhtml = Templates.renderPix(newpix, 'moodle', newtitlestr);
 
-        // Change the UI
-        var oldAction = button.getData('action');
-        button.replaceClass('editing_' + oldAction, 'editing_' + newtitle);
-        buttonimg.setAttrs({
-            'src': iconsrc
-        });
-        if (Y.Lang.trim(button.getAttribute('title'))) {
-            button.setAttribute('title', newtitlestr).setData('action', newtitle).setData('nextgroupmode', nextgroupmode);
-        }
+            // Change the UI
+            var oldAction = button.getData('action');
+            button.replaceClass('editing_' + oldAction, 'editing_' + newtitle);
+            buttonimg.replace(iconhtml);
+            if (Y.Lang.trim(button.getAttribute('title'))) {
+                button.setAttribute('title', newtitlestr).setData('action', newtitle).setData('nextgroupmode', nextgroupmode);
+            }
 
-        if (Y.Lang.trim(buttonimg.getAttribute('alt'))) {
-            buttonimg.setAttribute('alt', newtitlestr);
-        }
+            // And send the request
+            data = {
+                'class': 'resource',
+                'field': 'groupmode',
+                'value': groupmode,
+                'id': Y.Moodle.core_course.util.cm.getId(activity)
+            };
 
-        // And send the request
-        data = {
-            'class': 'resource',
-            'field': 'groupmode',
-            'value': groupmode,
-            'id': Y.Moodle.core_course.util.cm.getId(activity)
-        };
-
-        spinner = this.add_spinner(activity);
-        this.send_request(data, spinner);
+            spinner = this.add_spinner(activity);
+            this.send_request(data, spinner);
+        }.bind(this));
         return this;
     },
 
