@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 === 3.3 ===
 * Moodle has support for font-awesome icons. Plugins should use the xxx_get_fontawesome_icon_map callback
   to map their custom icons to one from font-awesome.
+* $OUTPUT->pix_url() has been deprecated because it is was used mostly to manually generate image tags for icons. Use pix_icon instead.
+  For other valid use cases use $OUTPUT->image_url().
 * Activity icons have been split from standard icons. Use $OUTPUT->activity_icon instead of $OUTPUT->pix_icon for these
   type of icons (the coloured main icon for each activity).
 * YUI module moodle-core-formautosubmit has been removed, use jquery .change() instead (see lib/templates/url_select.mustache for
